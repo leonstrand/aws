@@ -23,7 +23,7 @@ index=$(expr $number - 1)
 echo
 echo
 echo $0: info: adding ssh host keys for index $number with aws id ${ids[$index]} to ~/.ssh/known_hosts if not already present
-ssh_host_key="$(ssh-keyscan.exe $(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName'))"
+ssh_host_key="$(ssh-keyscan $(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName'))"
 grep "$ssh_host_key" ~/.ssh/known_hosts || echo "$ssh_host_key" | tee -a ~/.ssh/known_hosts
 
 echo
