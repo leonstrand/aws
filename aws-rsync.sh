@@ -18,8 +18,9 @@ for index in $(seq 0 $(expr ${#instances[@]} - 1)); do
 done
 
 echo
-echo -n $0: select aws instance for rsync:\ 
+echo -n $0: select aws instance for rsync [1]:\ 
 read index
+[ -z "$index" ] && index=1
 index=$(expr $index - 1)
 instance=${instances[$index]}
 if [ -z "$instance" ]; then
