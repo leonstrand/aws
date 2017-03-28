@@ -1,3 +1,4 @@
 alias au='command="time ~/aws/aws-up.sh"; echo $command; eval $command'
 alias ad='command="time ~/aws/aws-down.sh"; echo $command; eval $command'
 alias ac='command="time ~/aws/aws-connect.sh"; echo $command; eval $command'
+alias ar='command="time ~/aws/aws-rsync.sh"; echo $command; eval $command'
