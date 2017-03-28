@@ -16,8 +16,9 @@ done
 
 echo
 echo
-echo -n enter index to connect to via ssh:\ 
+echo -n enter index to connect to via ssh [1]:\ 
 read number
+[ "$number" == '' ] && number=1
 index=$(expr $number - 1)
 
 echo
