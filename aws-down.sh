@@ -16,11 +16,12 @@ done
 
 echo
 echo
-echo -n enter index to stop:\ 
-read number
-index=$(expr $number - 1)
+echo -n enter index to stop [1]:\ 
+read index
+[ "$index" == '' ] && index=1
+index=$(expr $index - 1)
 echo
-echo $0: info: stopping index $number with aws id ${ids[$index]}
+echo $0: info: stopping index $(expr $index + 1) with aws id ${ids[$index]}
 echo time aws ec2 stop-instances --instance-ids ${ids[$index]} \| jq
 time aws ec2 stop-instances --instance-ids ${ids[$index]} | jq
 

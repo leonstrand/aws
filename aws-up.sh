@@ -16,11 +16,12 @@ done
 
 echo
 echo
-echo -n enter index to start:\ 
-read number
-index=$(expr $number - 1)
+echo -n enter index to start [1]:\ 
+read index
+[ "$index" == '' ] && index=1
+index=$(expr $index - 1)
 echo
-echo $0: info: starting index $number with aws id ${ids[$index]}
+echo $0: info: starting index $(expr $index + 1) with aws id ${ids[$index]}
 echo time aws ec2 start-instances --instance-ids ${ids[$index]} \| jq
 time aws ec2 start-instances --instance-ids ${ids[$index]} | jq
 
