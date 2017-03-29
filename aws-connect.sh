@@ -29,6 +29,20 @@ grep "$ssh_host_key" ~/.ssh/known_hosts || echo "$ssh_host_key" | tee -a ~/.ssh/
 
 echo
 echo
+echo $0: info: determining username for index $number with aws id ${ids[$index]}
+json=$(aws ec2 describe-images --image-ids $(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .ImageId'))
+description=$(echo "$json" | jq -r '.Images | .[] | .Description')
+echo $0: info: image description: $description
+shopt -s nocasematch
+case $description in
+  *amazon*) ssh_user='ec2-user';;
+  *centos*) ssh_user='centos';;
+  *) echo $0: fatal: unknown operating system, can not determine username; exit 1;;
+esac
+echo $0: info: username: $ssh_user
+
+echo
+echo
 echo $0: info: connecting to index $number with aws id ${ids[$index]} via ssh
-echo ssh -i ~/.ssh/my-west-keypair.pem ec2-user@\"$\(aws ec2 describe-instances --instance-ids ${ids[$index]} \| jq -r \'.Reservations \| .[] \| .Instances \| .[] \| .PublicDnsName\'\)\"
-ssh -i ~/.ssh/my-west-keypair.pem ec2-user@"$(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName')"
+echo ssh -i ~/.ssh/my-west-keypair.pem $ssh_user@\"$\(aws ec2 describe-instances --instance-ids ${ids[$index]} \| jq -r \'.Reservations \| .[] \| .Instances \| .[] \| .PublicDnsName\'\)\"
+ssh -i ~/.ssh/my-west-keypair.pem $ssh_user@"$(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName')"
