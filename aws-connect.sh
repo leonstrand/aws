@@ -28,9 +28,21 @@ index=$(expr $number - 1)
 
 echo
 echo
-echo $0: info: adding ssh host keys for index $number with aws id ${ids[$index]} to ~/.ssh/known_hosts if not already present
-ssh_host_key="$(ssh-keyscan $(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName'))"
-grep "$ssh_host_key" ~/.ssh/known_hosts || echo "$ssh_host_key" | tee -a ~/.ssh/known_hosts
+echo $0: info: getting ssh host keys for index $number with aws id ${ids[$index]}
+echo time ssh-keyscan \$\(aws ec2 describe-instances --instance-ids ${ids[$index]} \| jq -r \''.Reservations | .[] | .Instances | .[] | .PublicDnsName'\'\)
+ssh_host_keys="$(time ssh-keyscan $(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName'))"
+if [ -n "$ssh_host_keys" ]; then
+  echo
+  echo $0: info: ssh host keys:
+  echo "$ssh_host_keys"
+  echo
+  echo $0: info: adding ssh host keys for index $number with aws id ${ids[$index]} to ~/.ssh/known_hosts if not already present
+  grep "$ssh_host_keys" ~/.ssh/known_hosts || echo "$ssh_host_keys" | tee -a ~/.ssh/known_hosts
+else
+  echo
+  echo $0: fatal: failed to get ssh host keys for index $number with aws id ${ids[$index]} \(no response to ssh-keyscan\)
+  exit 1
+fi
 
 echo
 echo
@@ -52,4 +64,4 @@ echo $0: info: connecting to index $number with aws id ${ids[$index]} via ssh
 echo ssh -i ~/.ssh/my-west-keypair.pem $ssh_user@\"$\(aws ec2 describe-instances --instance-ids ${ids[$index]} \| jq -r \'.Reservations \| .[] \| .Instances \| .[] \| .PublicDnsName\'\)\"
 echo
 echo
-ssh -i ~/.ssh/my-west-keypair.pem $ssh_user@"$(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName')"
+ssh -vi ~/.ssh/my-west-keypair.pem $ssh_user@"$(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName')"
