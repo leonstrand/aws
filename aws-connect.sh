@@ -3,15 +3,20 @@
 
 echo
 echo
-echo $0: info: getting running instances
-echo time aws ec2 describe-instances --filters \'Name=instance-state-name,Values=running\'
-json="$(time aws ec2 describe-instances --filters 'Name=instance-state-name,Values=running')"
-ids=($(echo "$json" | jq -r '.Reservations | .[] | .Instances | .[] | .InstanceId'))
+echo $0: info: getting instances
+echo time aws ec2 describe-instances
+json_instances="$(time aws ec2 describe-instances --filters Name=instance-state-name,Values=running)"
+ids=($(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | .InstanceId'))
+echo
+echo $0: info: getting images
+echo time aws ec2 describe-images --image-ids $(echo $json_instances | jq -r '.Reservations | .[] | .Instances | .[] | .ImageId')
+json_images=$(time aws ec2 describe-images --image-ids $(echo $json_instances | jq -r '.Reservations | .[] | .Instances | .[] | .ImageId') | jq .)
 echo
 echo
-printf '%s\t%s\t\t\t%s\t\t%s\t\t%s\n' index 'aws id' type state image
+printf '%s\t%s\t\t\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\n' index 'aws id' type state image 'creation time' 'image description'
 for i in ${!ids[@]}; do
-  printf '%s\t%s\t%s\t%s\t\t%s\n' $(expr $i + 1) ${ids[$i]} $(echo "$json" | jq -rc '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .InstanceType, .State.Name, .ImageId')
+  image=$(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .ImageId')
+  printf '%s\t%s\t%s\t%s\t\t%s\t%s\t%s\n' $(expr $i + 1) ${ids[$i]} $(echo "$json_instances" | jq -rc '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .InstanceType, .State.Name, .ImageId') $(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .NetworkInterfaces | .[] | .Attachment.AttachTime') "$(echo "$json_images" | jq -r '.Images | .[] | select(.ImageId == "'$image'") | .Description')"
 done
 
 echo
