@@ -22,6 +22,7 @@ menu() {
 }
 
 menu
+
 echo
 echo
 echo -n enter index to start [1]:\ 
