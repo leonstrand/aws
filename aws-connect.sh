@@ -61,7 +61,7 @@ echo $0: info: username: $ssh_user
 echo
 echo
 echo $0: info: connecting to index $number with aws id ${ids[$index]} via ssh
-echo ssh -i ~/.ssh/my-west-keypair.pem $ssh_user@\"$\(aws ec2 describe-instances --instance-ids ${ids[$index]} \| jq -r \'.Reservations \| .[] \| .Instances \| .[] \| .PublicDnsName\'\)\"
+echo ssh -vi ~/.ssh/my-west-keypair.pem $ssh_user@\"$\(aws ec2 describe-instances --instance-ids ${ids[$index]} \| jq -r \'.Reservations \| .[] \| .Instances \| .[] \| .PublicDnsName\'\)\"
 echo
 echo
 ssh -vi ~/.ssh/my-west-keypair.pem $ssh_user@"$(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .PublicDnsName')"
