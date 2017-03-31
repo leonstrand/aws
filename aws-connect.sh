@@ -3,8 +3,8 @@
 
 echo
 echo
-echo $0: info: getting instances
-echo time aws ec2 describe-instances
+echo $0: info: getting running instances
+echo time aws ec2 describe-instances --filters Name=instance-state-name,Values=running
 json_instances="$(time aws ec2 describe-instances --filters Name=instance-state-name,Values=running)"
 ids=($(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | .InstanceId'))
 echo
