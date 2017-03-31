@@ -6,7 +6,8 @@ menu() {
   echo
   echo $0: info: getting instances
   echo time aws ec2 describe-instances
-  json_instances="$(time aws ec2 describe-instances)"
+  #json_instances="$(time aws ec2 describe-instances)"
+  json_instances="$(time aws ec2 describe-instances --filters Name=instance-state-name,Values=pending,running,shutting-down,stopping,stopped)"
   ids=($(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | .InstanceId'))
   echo
   echo $0: info: getting images
