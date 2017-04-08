@@ -46,7 +46,7 @@ case "$direction" in
     echo
     echo $0: info:
     echo time rsync -av --partial --progress -e \"ssh -i $ssh_key\" $ssh_user@\"$instance\":$source_path $destination_path
-    time rsync -av --partial --progress -e "ssh -i $ssh_key" $ssh_user@"$instance":$source_path $destination_path
+    time rsync -av --partial --progress -e "ssh -vi $ssh_key" $ssh_user@"$instance":$source_path $destination_path
   ;;
   d)
     echo
