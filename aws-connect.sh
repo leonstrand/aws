@@ -54,6 +54,7 @@ shopt -s nocasematch
 case $description in
   *amazon*) ssh_user='ec2-user';;
   *centos*) ssh_user='centos';;
+  '[Copied ami-8995109f from us-east-1]') ssh_user='dbadmin';;
   *) echo $0: fatal: unknown operating system, can not determine username; exit 1;;
 esac
 echo $0: info: username: $ssh_user
