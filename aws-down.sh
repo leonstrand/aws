@@ -14,10 +14,10 @@ menu() {
   json_images=$(time aws ec2 describe-images --image-ids $(echo $json_instances | jq -r '.Reservations | .[] | .Instances | .[] | .ImageId') | jq .)
   echo
   echo
-  printf '%s\t%s\t\t\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\n' index 'aws id' type state image 'creation time' 'image description'
+  printf '%6s %51s\t%19s\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\n' index 'public hostname' 'aws id' type state image 'creation time' 'image description'
   for i in ${!ids[@]}; do
     image=$(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .ImageId')
-    printf '%s\t%s\t%s\t%s\t\t%s\t%s\t%s\n' $(expr $i + 1) ${ids[$i]} $(echo "$json_instances" | jq -rc '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .InstanceType, .State.Name, .ImageId') $(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .NetworkInterfaces | .[] | .Attachment.AttachTime') "$(echo "$json_images" | jq -r '.Images | .[] | select(.ImageId == "'$image'") | .Description')"
+    printf '%6s %51s\t%19s\t%s\t%s\t\t%s\t%s\t%s\n' $(expr $i + 1) $(echo "$json_instances" | jq -rc '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .PublicDnsName') ${ids[$i]} $(echo "$json_instances" | jq -rc '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .InstanceType, .State.Name, .ImageId') $(echo "$json_instances" | jq -r '.Reservations | .[] | .Instances | .[] | select(.InstanceId == "'${ids[$i]}'") | .NetworkInterfaces | .[] | .Attachment.AttachTime') "$(echo "$json_images" | jq -r '.Images | .[] | select(.ImageId == "'$image'") | .Description')"
   done
 }
 
