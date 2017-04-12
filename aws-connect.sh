@@ -54,7 +54,14 @@ case $description in
   *amazon*) ssh_user='ec2-user';;
   *centos*) ssh_user='centos';;
   '[Copied ami-8995109f from us-east-1]') ssh_user='dbadmin';;
-  *) echo $0: fatal: unknown operating system, can not determine username; exit 1;;
+  *)
+    name="$(aws ec2 describe-images --image-ids $(aws ec2 describe-instances --instance-ids ${ids[$index]} | jq -r '.Reservations | .[] | .Instances | .[] | .ImageId') | jq -r '.Images | .[] | .Name')"
+    echo $0: info: image name: $name
+    case $name in
+      *vertica*) ssh_user='dbadmin';;
+      *) echo $0: fatal: unknown operating system, can not determine username; exit 1;;
+    esac
+  ;;
 esac
 echo $0: info: username: $ssh_user
 
